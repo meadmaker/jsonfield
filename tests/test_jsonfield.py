@@ -20,6 +20,7 @@ from .models import (
     MTIParentModel,
     OrderedJSONModel,
     RemoteJSONModel,
+    JSONEmptyOptionsModel,
 )
 
 
@@ -395,6 +396,24 @@ class QueryTests(TestCase):
         JSONRequiredModel.objects.create(json=100)
         self.assertEqual(JSONRequiredModel.objects.count(), 2)
         self.assertEqual(JSONRequiredModel.objects.filter(json__isnull=True).count(), 0)
+
+    def test_empty_values_options(self):
+        JSONEmptyOptionsModel.objects.create(empty_dict_explicit={})
+        JSONEmptyOptionsModel.objects.create(empty_dict_allowed={})
+        JSONEmptyOptionsModel.objects.create(empty_list_explicit=[])
+        JSONEmptyOptionsModel.objects.create(empty_list_allowed=[])
+
+        self.assertEqual(JSONEmptyOptionsModel.objects.count(), 4)
+
+        self.assertEqual(JSONEmptyOptionsModel.objects.filter(empty_dict_explicit__isnull=True).count(), 0)
+        self.assertEqual(JSONEmptyOptionsModel.objects.filter(empty_dict_allowed__isnull=True).count(), 0)
+        self.assertEqual(JSONEmptyOptionsModel.objects.filter(empty_list_explicit__isnull=True).count(), 0)
+        self.assertEqual(JSONEmptyOptionsModel.objects.filter(empty_list_allowed__isnull=True).count(), 0)
+
+        self.assertEqual(JSONEmptyOptionsModel.objects.filter(empty_dict_explicit={}).count(), 1)
+        self.assertEqual(JSONEmptyOptionsModel.objects.filter(empty_dict_allowed={}).count(), 1)
+        self.assertEqual(JSONEmptyOptionsModel.objects.filter(empty_list_explicit=[]).count(), 1)
+        self.assertEqual(JSONEmptyOptionsModel.objects.filter(empty_list_allowed=[]).count(), 1)
 
     def test_regex_lookup(self):
         JSONModel.objects.create(json={'boom': 'town'})

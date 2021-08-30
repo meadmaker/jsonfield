@@ -107,4 +107,15 @@ class Migration(migrations.Migration):
                 ('content_type', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='contenttypes.ContentType')),
             ],
         ),
+        migrations.CreateModel(
+            name='JSONEmptyOptionsModel',
+            fields=[
+                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('default', jsonfield.fields.JSONField()),
+                ('empty_dict_explicit', jsonfield.fields.JSONField(default={'a': 'b'}, blank=False, primary_key=False)),
+                ('empty_dict_allowed', jsonfield.fields.JSONField(default={'a': 'b'}, blank=False)),
+                ('empty_list_explicit', jsonfield.fields.JSONField(default=[1, 2, 3], blank=False)),
+                ('empty_list_allowed', jsonfield.fields.JSONField(default=[1, 2, 3], blank=False, primary_key=False)),
+            ]
+        ),
     ]

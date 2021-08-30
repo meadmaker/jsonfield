@@ -65,6 +65,14 @@ class JSONNotRequiredModel(models.Model):
     json = JSONField(blank=True, null=True)
 
 
+class JSONEmptyOptionsModel(models.Model):
+    default = JSONField(default=[1, 2, 3], blank=False)
+    empty_dict_explicit = JSONField(empty_values=[None, '', [], ()], default={'a': 'b'}, blank=False, null=False)
+    empty_dict_allowed = JSONField(allowed_empty_values=[{}], default={'a': 'b'}, blank=False, null=False)
+    empty_list_explicit = JSONField(empty_values=[None, '', {}, ()], default=[1, 2, 3], blank=False, null=False)
+    empty_list_allowed = JSONField(allowed_empty_values=[[]], default=[1, 2, 3], blank=False, null=False)
+
+
 class OrderedJSONModel(models.Model):
     json = JSONField(load_kwargs={'object_pairs_hook': OrderedDict})
 

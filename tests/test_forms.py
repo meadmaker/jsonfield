@@ -1,7 +1,7 @@
 from django import forms
 from django.test import TestCase
 
-from .models import JSONNotRequiredModel
+from .models import JSONNotRequiredModel, JSONEmptyOptionsModel
 
 
 class JSONModelFormTest(TestCase):
@@ -118,6 +118,52 @@ class JSONModelFormTest(TestCase):
 
         form = self.form_class(data={'json': '[3, 4]'}, instance=instance)
         self.assertTrue(form.has_changed())
+
+
+class JSONEmptyOptionsFormTest(TestCase):
+    def setUp(self):
+        class JSONEmptyOptionsForm(forms.ModelForm):
+            class Meta:
+                model = JSONEmptyOptionsModel
+                fields = '__all__'
+
+        self.form_class = JSONEmptyOptionsForm
+        self.base_data = {
+            'default': '[4, 5, 6]',
+            'empty_dict_explicit': '{"c": "d"}',
+            'empty_dict_allowed': '{"c": "d"}',
+            'empty_list_explicit': '[4, 5, 6]',
+            'empty_list_allowed': '[4, 5, 6]',
+        }
+
+    # Test that the 'default' field correctly rejects empty
+    # JSON expressions - [] and {}
+    def test_default_rejects(self):
+        for value in [{}, []]:
+            data = self.base_data
+            with self.subTest(default=value):
+                data['default'] = value
+                form = self.form_class(data=data)
+                self.assertFalse(form.is_valid())
+
+    # Test that the overrides for empty_values and
+    # allowed_empty_values work for both dicts - {} - and lists - [].
+    def test_all_overrides(self):
+        empty_data = {
+            'empty_dict_explicit': '{}',
+            'empty_dict_allowed': '{}',
+            'empty_list_explicit': '[]',
+            'empty_list_allowed': '[]',
+        }
+
+        for field_name in empty_data.keys():
+            data = self.base_data
+            update = dict()
+            update[field_name] = empty_data[field_name]
+            with self.subTest(update):
+                data[field_name] = empty_data[field_name]
+                form = self.form_class(data=data)
+                self.assertTrue(form.is_valid(), msg=form.errors)
 
 
 class NonJSONFieldModelFormTest(TestCase):
