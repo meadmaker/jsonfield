@@ -90,6 +90,21 @@ Note that as ``JSONField.null`` does not prevent nulls from being stored, achiev
 must instead be handled with a validator.
 
 
+Allowing empty JSON values
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+A JSONField's ``blank`` argument controls whether a Form will require the field to contain
+a value.  However, django fields by default consider ``None``, ``''``, ``[]``, ``{}``, and
+``()`` all to be blank, or empty, values.
+
+If one or more of these values should be accepted by this field, the JSONField()
+constructor now accepts two parameters to allow it.
+
+
+* **empty_values**: This list will override the above list of unacceptable blank/empty values.
+* **allowed_empty_values**: This list's items will be removed from the empty_values list.
+
+
 Advanced Usage
 --------------
 
