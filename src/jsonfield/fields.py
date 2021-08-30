@@ -25,9 +25,14 @@ INVALID_JSON_WARNING = (
 class JSONFieldMixin(models.Field):
     form_class = forms.JSONField
 
-    def __init__(self, *args, dump_kwargs=None, load_kwargs=None, **kwargs):
+    def __init__(self, *args, dump_kwargs=None, load_kwargs=None,
+                 empty_values=models.Field.empty_values,
+                 allowed_empty_values=[], **kwargs):
         self.dump_kwargs = DEFAULT_DUMP_KWARGS if dump_kwargs is None else dump_kwargs
         self.load_kwargs = DEFAULT_LOAD_KWARGS if load_kwargs is None else load_kwargs
+        self.empty_values = [value for value
+                             in empty_values
+                             if value not in allowed_empty_values]
 
         super().__init__(*args, **kwargs)
 
@@ -72,6 +77,7 @@ class JSONFieldMixin(models.Field):
         if issubclass(kwargs['form_class'], forms.JSONField):
             kwargs.setdefault('dump_kwargs', self.dump_kwargs)
             kwargs.setdefault('load_kwargs', self.load_kwargs)
+            kwargs.setdefault('empty_values', self.empty_values)
 
         return super().formfield(**kwargs)
 
@@ -103,6 +109,7 @@ class JSONField(JSONFieldMixin, models.TextField):
             # Note: TextField sets the Textarea widget
             field.dump_kwargs.setdefault('indent', 4)
             field.dump_kwargs.setdefault('ensure_ascii', False)
+            field.empty_values = self.empty_values
         return field
 
 

@@ -15,9 +15,14 @@ class JSONField(fields.CharField):
         'invalid': _('"%(value)s" value must be valid JSON.'),
     }
 
-    def __init__(self, *args, dump_kwargs=None, load_kwargs=None, **kwargs):
+    def __init__(self, *args, dump_kwargs=None, load_kwargs=None,
+                 empty_values=fields.CharField.empty_values,
+                 allowed_empty_values=[], **kwargs):
         self.dump_kwargs = dump_kwargs if dump_kwargs else {}
         self.load_kwargs = load_kwargs if load_kwargs else {}
+        self.empty_values = [value for value
+                             in empty_values
+                             if value not in allowed_empty_values]
 
         super().__init__(*args, **kwargs)
 
